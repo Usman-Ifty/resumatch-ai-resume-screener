@@ -34,19 +34,28 @@ router.post('/', upload.single('resume'), async (req, res) => {
 
     // Step 2: Build prompt
     const prompt =
-      'You are an expert ATS (Applicant Tracking System) and technical recruiter.\n\n' +
+      'You are a HIGHLY CRITICAL Senior Technical Recruiter and ATS parser.\n\n' +
       'Analyze the following resume against the job description and return a JSON response ONLY.\n' +
-      'Do not include any explanation or text outside the JSON block.\n\n' +
+      'Be brutally honest. Do not default to 85. Most people are NOT an 85% match.\n\n' +
+      'Scoring Methodology (MUST USE):\n' +
+      '- Hard Skills Match (40 pts): Do they have the EXACT tech stack?\n' +
+      '- Years of Experience (30 pts): Do they meet the seniority requirement?\n' +
+      '- Domain/Industry Knowledge (20 pts): Have they worked in this specific sector?\n' +
+      '- Soft Skills/Format (10 pts): Is the resume well-structured?\n\n' +
       'Resume:\n' + resumeText.substring(0, 4000) + '\n\n' +
       'Job Description:\n' + jobDescription.substring(0, 2000) + '\n\n' +
-      'Return ONLY this JSON structure — no extra text, no markdown:\n' +
+      'Return ONLY this JSON structure:\n' +
       '{\n' +
       '  "score": <integer 0-100>,\n' +
-      '  "verdict": "<one of: Strong Match | Good Match | Partial Match | Weak Match>",\n' +
+      '  "verdict": "<Strong | Good | Partial | Weak Match>",\n' +
       '  "matched_skills": ["skill1", "skill2"],\n' +
       '  "missing_skills": ["skill1", "skill2"],\n' +
-      '  "suggestions": ["3 specific bullet points to add to the resume for a better match"],\n' +
-      '  "reasoning": "<2-3 sentence explanation of the score>"\n' +
+      '  "suggestions": ["3 bullets to add"],\n' +
+      '  "cover_letter": "<250-word letter>",\n' +
+      '  "roadmap": ["Step 1", "Step 2"],\n' +
+      '  "ats_score": <integer 0-100>,\n' +
+      '  "ats_feedback": "<1-2 sentences on formatting/readability/keywords>",\n' +
+      '  "reasoning": "<1-2 sentence breakdown of the score based on the rubric>"\n' +
       '}';
 
     // Step 3: Call Groq API
@@ -65,6 +74,7 @@ router.post('/', upload.single('resume'), async (req, res) => {
       const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
       if (!jsonMatch) throw new Error('No JSON found in response');
       parsed = JSON.parse(jsonMatch[0]);
+      console.log('AI Response Parsed:', parsed);
     } catch (parseErr) {
       console.error('Groq parse error:', rawResponse);
       return res.status(500).json({ error: 'AI returned an unexpected format. Please try again.' });
@@ -79,6 +89,10 @@ router.post('/', upload.single('resume'), async (req, res) => {
       matchedSkills: parsed.matched_skills || [],
       missingSkills: parsed.missing_skills || [],
       suggestions: parsed.suggestions || [],
+      coverLetter: parsed.cover_letter || '',
+      roadmap: parsed.roadmap || [],
+      atsScore: parsed.ats_score || 0,
+      atsFeedback: parsed.ats_feedback || '',
       reasoning: parsed.reasoning || '',
     });
     await analysis.save();
@@ -90,7 +104,13 @@ router.post('/', upload.single('resume'), async (req, res) => {
       matchedSkills: parsed.matched_skills || [],
       missingSkills: parsed.missing_skills || [],
       suggestions: parsed.suggestions || [],
+      coverLetter: parsed.cover_letter || '',
+      roadmap: parsed.roadmap || [],
+      atsScore: parsed.ats_score || 0,
+      atsFeedback: parsed.ats_feedback || '',
       reasoning: parsed.reasoning || '',
+      resumeText: resumeText,
+      jobDescription: jobDescription,
       analysisId: analysis._id,
     });
 

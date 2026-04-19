@@ -3,7 +3,8 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiUploadCloud, FiFile, FiX, FiSearch } from 'react-icons/fi';
 
-const API_URL = 'http://localhost:5000/api/analyze';
+// Use environment variable or relative path for production
+const API_URL = import.meta.env.VITE_API_URL || '/api/analyze';
 
 export default function UploadForm({ onResults, onError, loading, setLoading }) {
   const [files, setFiles] = useState([]);

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { FiTrash2, FiClock, FiCheckCircle, FiFileText } from 'react-icons/fi';
 
-const API_URL = 'http://localhost:5000/api/analyze/history';
+const API_URL = '/api/analyze/history';
 
 export default function HistoryDashboard({ onViewResult }) {
   const [history, setHistory] = useState([]);
@@ -70,7 +70,7 @@ export default function HistoryDashboard({ onViewResult }) {
                   <FiClock /> {new Date(item.createdAt).toLocaleDateString()}
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <FiCheckCircle /> {item.matchedSkills?.length} Skills
+                  <FiCheckCircle /> {(item.matchedSkills || []).length} Skills
                 </span>
               </div>
             </motion.div>

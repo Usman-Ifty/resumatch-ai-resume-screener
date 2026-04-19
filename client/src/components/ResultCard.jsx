@@ -1,9 +1,16 @@
-import { motion } from 'framer-motion';
-import { FiDownload, FiArrowLeft, FiAward, FiCheckCircle, FiXCircle, FiZap } from 'react-icons/fi';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiDownload, FiArrowLeft, FiAward, FiCheckCircle, FiXCircle, FiZap, FiChevronDown, FiChevronUp, FiCopy, FiMap } from 'react-icons/fi';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 export default function ResultCard({ results, onReset }) {
+  const [showPreviews, setShowPreviews] = useState({});
+  const [copied, setCopied] = useState(false);
+
+  const togglePreview = (idx) => {
+    setShowPreviews(prev => ({ ...prev, [idx]: !prev[idx] }));
+  };
   // Sort results by score descending for ranking
   const sorted = [...results].sort((a, b) => b.score - a.score);
 
@@ -73,7 +80,24 @@ export default function ResultCard({ results, onReset }) {
               <div className="verdict-info">
                 <p className="section-label">Analysis for {res.fileName || 'Resume'}</p>
                 <h2 className="verdict-label">{res.verdict}</h2>
-                <p style={{ color: 'var(--text-dim)', lineHeight: 1.6 }}>{res.reasoning}</p>
+                <p style={{ color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: '20px' }}>{res.reasoning}</p>
+                
+                {/* ATS Health Badge */}
+                <div style={{ padding: '15px', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-main)' }}>ATS FRIENDLINESS</span>
+                    <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--neon-blue)' }}>{res.atsScore}%</span>
+                  </div>
+                  <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '3px', overflow: 'hidden', marginBottom: '10px' }}>
+                    <motion.div 
+                      initial={{ width: 0 }} 
+                      animate={{ width: `${res.atsScore}%` }} 
+                      transition={{ duration: 1 }}
+                      style={{ height: '100%', background: 'var(--neon-blue)', boxShadow: '0 0 10px var(--neon-blue)' }} 
+                    />
+                  </div>
+                  <p style={{ fontSize: '12px', color: 'var(--text-dim)', fontStyle: 'italic' }}>"{res.atsFeedback}"</p>
+                </div>
               </div>
             </div>
 
@@ -113,6 +137,82 @@ export default function ResultCard({ results, onReset }) {
               {res.suggestions?.map((s, i) => (
                 <div key={i} className="suggestion-item">{s}</div>
               ))}
+            </div>
+
+            {/* Career Roadmap */}
+            <div style={{ marginTop: '30px', padding: '24px', background: 'rgba(0, 242, 255, 0.05)', borderRadius: '18px', border: '1px solid rgba(0, 242, 255, 0.2)' }}>
+              <h3 className="section-label" style={{ color: 'var(--neon-blue)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <FiMap /> Career Growth Roadmap
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '15px' }}>
+                {res.roadmap?.map((step, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <div style={{ width: '30px', height: '30px', background: 'var(--neon-blue)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'black', fontWeight: 800, fontSize: '12px', flexShrink: 0 }}>
+                      {i + 1}
+                    </div>
+                    <div style={{ color: 'var(--text-main)', fontSize: '14px' }}>{step}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* AI Cover Letter */}
+            <div style={{ marginTop: '30px', padding: '30px', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '18px', border: '1px solid var(--glass-border)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h3 className="section-label" style={{ margin: 0 }}>Customized Cover Letter</h3>
+                <button 
+                  className="nav-btn" 
+                  style={{ padding: '6px 12px', fontSize: '12px' }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(res.coverLetter);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                >
+                  {copied ? 'Copied!' : <><FiCopy style={{ marginRight: '5px' }} /> Copy</>}
+                </button>
+              </div>
+              <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: 'var(--text-dim)', fontSize: '14px', lineHeight: 1.8 }}>
+                {res.coverLetter}
+              </pre>
+            </div>
+
+            {/* Data Preview Section */}
+            <div style={{ marginTop: '20px' }}>
+              <button 
+                className="nav-btn" 
+                style={{ width: '100%', justifyContent: 'center', borderStyle: 'dashed' }}
+                onClick={() => togglePreview(idx)}
+              >
+                {showPreviews[idx] ? <FiChevronUp /> : <FiChevronDown />} 
+                {showPreviews[idx] ? 'Hide Source Data' : 'View Extracted Data & Job Description'}
+              </button>
+
+              <AnimatePresence>
+                {showPreviews[idx] && (
+                  <motion.div 
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    style={{ overflow: 'hidden' }}
+                  >
+                    <div className="heatmap-container" style={{ marginTop: '20px' }}>
+                      <div className="heatmap-box" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                        <span className="section-label">Extracted Resume Text</span>
+                        <pre style={{ fontSize: '11px', color: 'var(--text-dim)', whiteSpace: 'pre-wrap', fontFamily: 'JetBrains Mono' }}>
+                          {res.resumeText}
+                        </pre>
+                      </div>
+                      <div className="heatmap-box" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                        <span className="section-label">Job Description</span>
+                        <pre style={{ fontSize: '11px', color: 'var(--text-dim)', whiteSpace: 'pre-wrap', fontFamily: 'JetBrains Mono' }}>
+                          {res.jobDescription}
+                        </pre>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         ))}

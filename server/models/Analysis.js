@@ -33,6 +33,22 @@ const AnalysisSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    coverLetter: {
+      type: String,
+      default: '',
+    },
+    roadmap: {
+      type: [String],
+      default: [],
+    },
+    atsScore: {
+      type: Number,
+      default: 0,
+    },
+    atsFeedback: {
+      type: String,
+      default: '',
+    },
     reasoning: {
       type: String,
       default: '',

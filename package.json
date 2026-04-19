@@ -4,7 +4,9 @@
   "description": "<div align=\"center\">",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"cd server && node index.js\" \"cd client && npm run dev\""
+    "dev": "concurrently \"cd server && node index.js\" \"cd client && npm run dev\"",
+    "build": "cd client && npm install && npm run build && cd ../server && npm install",
+    "start": "cd server && NODE_ENV=production node index.js"
   },
   "repository": {
     "type": "git",

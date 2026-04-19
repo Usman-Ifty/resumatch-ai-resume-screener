@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 
 dotenv.config();
 
@@ -13,13 +14,23 @@ app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 
 // Routes
-const analyzeRoute = require('./routes/analyze');
-app.use('/api/analyze', analyzeRoute);
+const analyzeRoutes = require('./routes/analyze');
+app.use('/api/analyze', analyzeRoutes);
 
-// Health check
-app.get('/', (req, res) => {
-  res.json({ message: 'ResuMatch API is running' });
-});
+// --- SERVE FRONTEND IN PRODUCTION ---
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the React app dist folder
+  app.use(express.static(path.join(__dirname, '../client/dist')));
+
+  // For any request that doesn't match an API route, send back index.html
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.json({ message: 'ResuMatch API is running' });
+  });
+}
 
 // Connect to MongoDB then start server
 mongoose

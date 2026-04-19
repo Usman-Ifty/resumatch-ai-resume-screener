@@ -119,7 +119,15 @@ function App() {
         <div className="author-badge">
           Designed & Developed by <span className="author-name">Muhammad Usman Awan</span> 🚀
         </div>
-        <p style={{ marginTop: '15px', color: 'var(--text-dim)', fontSize: '12px' }}>
+        <div className="social-links" style={{ marginTop: '15px', display: 'flex', justifyContent: 'center', gap: '20px' }}>
+          <a href="https://github.com/Usman-Ifty" target="_blank" rel="noopener noreferrer" className="nav-btn" style={{ padding: '8px 15px', fontSize: '13px' }}>
+            <FiCpu /> GitHub
+          </a>
+          <a href="https://linkedin.com/in/usman-awan-a85877359" target="_blank" rel="noopener noreferrer" className="nav-btn" style={{ padding: '8px 15px', fontSize: '13px', borderColor: '#0077b5', color: '#0077b5' }}>
+            <FiUser /> LinkedIn
+          </a>
+        </div>
+        <p style={{ marginTop: '20px', color: 'var(--text-dim)', fontSize: '12px' }}>
           Built with Groq · LLaMA 3.3 · MERN · Framer Motion
         </p>
       </footer>
