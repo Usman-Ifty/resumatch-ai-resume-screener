@@ -1,7 +1,7 @@
 node_modules/
 .env
-dist/
 *.log
 .DS_Store
 client/node_modules/
 server/node_modules/
+# Don't ignore client/dist — Railway serves it via Express static
