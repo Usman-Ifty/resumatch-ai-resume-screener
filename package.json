@@ -1,0 +1,24 @@
+{
+  "name": "resumatch",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"cd server && node index.js\" \"cd client && npm run dev\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Usman-Ifty/resumatch-ai-resume-screener.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Usman-Ifty/resumatch-ai-resume-screener/issues"
+  },
+  "homepage": "https://github.com/Usman-Ifty/resumatch-ai-resume-screener#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
