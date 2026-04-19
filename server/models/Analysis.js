@@ -29,6 +29,10 @@ const AnalysisSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    suggestions: {
+      type: [String],
+      default: [],
+    },
     reasoning: {
       type: String,
       default: '',

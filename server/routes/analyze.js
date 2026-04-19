@@ -45,6 +45,7 @@ router.post('/', upload.single('resume'), async (req, res) => {
       '  "verdict": "<one of: Strong Match | Good Match | Partial Match | Weak Match>",\n' +
       '  "matched_skills": ["skill1", "skill2"],\n' +
       '  "missing_skills": ["skill1", "skill2"],\n' +
+      '  "suggestions": ["3 specific bullet points to add to the resume for a better match"],\n' +
       '  "reasoning": "<2-3 sentence explanation of the score>"\n' +
       '}';
 
@@ -77,6 +78,7 @@ router.post('/', upload.single('resume'), async (req, res) => {
       verdict: parsed.verdict,
       matchedSkills: parsed.matched_skills || [],
       missingSkills: parsed.missing_skills || [],
+      suggestions: parsed.suggestions || [],
       reasoning: parsed.reasoning || '',
     });
     await analysis.save();
@@ -87,6 +89,7 @@ router.post('/', upload.single('resume'), async (req, res) => {
       verdict: parsed.verdict,
       matchedSkills: parsed.matched_skills || [],
       missingSkills: parsed.missing_skills || [],
+      suggestions: parsed.suggestions || [],
       reasoning: parsed.reasoning || '',
       analysisId: analysis._id,
     });
@@ -94,6 +97,26 @@ router.post('/', upload.single('resume'), async (req, res) => {
   } catch (err) {
     console.error('Analyze error:', err.message);
     res.status(500).json({ error: 'Something went wrong. Please try again.' });
+  }
+});
+
+// GET /api/analyze/history
+router.get('/history', async (req, res) => {
+  try {
+    const history = await Analysis.find().sort({ createdAt: -1 });
+    res.json(history);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch history' });
+  }
+});
+
+// DELETE /api/analyze/history/:id
+router.delete('/history/:id', async (req, res) => {
+  try {
+    await Analysis.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete entry' });
   }
 });
 
