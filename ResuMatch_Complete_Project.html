@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ResuMatch — Complete Project Files</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0f0f1a; color: #cdd6f4; font-family: 'Courier New', monospace; font-size: 13px; }
+.header { background: #1e1e2e; padding: 16px 24px; border-bottom: 1px solid #313244; display: flex; justify-content: space-between; align-items: center; }
+.header h1 { color: #89b4fa; font-size: 16px; }
+.header .badge { background: #a6e3a1; color: #1e1e2e; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+.layout { display: flex; height: calc(100vh - 53px); }
+.sidebar { width: 240px; background: #181825; border-right: 1px solid #313244; overflow-y: auto; flex-shrink: 0; }
+.sidebar-title { padding: 12px 16px; font-size: 11px; color: #6c7086; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #313244; }
+.file-item { padding: 9px 16px; cursor: pointer; font-size: 12px; color: #a6adc8; border-left: 3px solid transparent; transition: all 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-item:hover { background: #1e1e2e; color: #cdd6f4; }
+.file-item.active { background: #1e1e2e; color: #89b4fa; border-left-color: #89b4fa; }
+.file-item.folder { color: #f9e2af; cursor: default; font-weight: bold; margin-top: 6px; padding-top: 12px; }
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.tab-bar { background: #1e1e2e; padding: 8px 16px; display: flex; gap: 8px; align-items: center; border-bottom: 1px solid #313244; }
+.copy-btn { background: #89b4fa; color: #1e1e2e; border: none; padding: 6px 14px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; }
+.copy-btn:hover { background: #74c7ec; }
+.copy-btn.copied { background: #a6e3a1; }
+.filename-display { color: #f9e2af; font-size: 12px; flex: 1; }
+.code-area { flex: 1; overflow-y: auto; padding: 20px 24px; }
+pre { white-space: pre; line-height: 1.6; color: #cdd6f4; font-size: 12.5px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📄 ResuMatch — Complete Project Files</h1>
+  <span class="badge">MERN + Groq + LLaMA 3</span>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-title">Project Files</div>
+
+    <div class="file-item folder">📋 Instructions</div>
+    <div class="file-item active" onclick="show('setup', this)">SETUP &amp; COMMANDS</div>
+
+    <div class="file-item folder">📁 server/</div>
+    <div class="file-item" onclick="show('env', this)">&nbsp;&nbsp;.env</div>
+    <div class="file-item" onclick="show('gitignore', this)">&nbsp;&nbsp;.gitignore</div>
+    <div class="file-item" onclick="show('pkg_server', this)">&nbsp;&nbsp;package.json</div>
+    <div class="file-item" onclick="show('server_index', this)">&nbsp;&nbsp;index.js</div>
+    <div class="file-item" onclick="show('analyze_route', this)">&nbsp;&nbsp;routes/analyze.js</div>
+    <div class="file-item" onclick="show('model', this)">&nbsp;&nbsp;models/Analysis.js</div>
+
+    <div class="file-item folder">📁 client/</div>
+    <div class="file-item" onclick="show('vite_config', this)">&nbsp;&nbsp;vite.config.js</div>
+    <div class="file-item" onclick="show('index_html', this)">&nbsp;&nbsp;index.html</div>
+    <div class="file-item" onclick="show('pkg_client', this)">&nbsp;&nbsp;package.json</div>
+    <div class="file-item" onclick="show('main_jsx', this)">&nbsp;&nbsp;src/main.jsx</div>
+    <div class="file-item" onclick="show('app_jsx', this)">&nbsp;&nbsp;src/App.jsx</div>
+    <div class="file-item" onclick="show('uploadform', this)">&nbsp;&nbsp;src/components/UploadForm.jsx</div>
+    <div class="file-item" onclick="show('resultcard', this)">&nbsp;&nbsp;src/components/ResultCard.jsx</div>
+    <div class="file-item" onclick="show('css', this)">&nbsp;&nbsp;src/index.css</div>
+
+    <div class="file-item folder">📁 root/</div>
+    <div class="file-item" onclick="show('readme', this)">&nbsp;&nbsp;README.md</div>
+  </div>
+
+  <div class="main">
+    <div class="tab-bar">
+      <span class="filename-display" id="fname">SETUP &amp; COMMANDS</span>
+      <button class="copy-btn" id="copybtn" onclick="copyActive(this)">Copy</button>
+    </div>
+    <div class="code-area">
+      <pre id="display"></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+const files = {
+
+setup: {
+  name: "SETUP & COMMANDS",
+  content:
+`RESUMATCH — SETUP INSTRUCTIONS
+================================
+
+FOLDER STRUCTURE TO CREATE:
+  resumatch/
+  ├── server/
+  │   ├── routes/
+  │   ├── models/
+  │   ├── index.js
+  │   ├── .env
+  │   ├── .gitignore
+  │   └── package.json
+  └── client/         (created by Vite automatically)
+
+-------------------------------------------------
+STEP 1 — Create server folder
+-------------------------------------------------
+  mkdir resumatch
+  cd resumatch
+  mkdir server
+  cd server
+  mkdir routes models
+
+-------------------------------------------------
+STEP 2 — Install server dependencies
+-------------------------------------------------
+  cd resumatch/server
+  npm init -y
+  npm install express mongoose multer pdf-parse groq-sdk cors dotenv
+
+-------------------------------------------------
+STEP 3 — Create React client with Vite
+-------------------------------------------------
+  cd resumatch
+  npm create vite@latest client -- --template react
+  cd client
+  npm install
+  npm install axios
+
+-------------------------------------------------
+STEP 4 — Get your FREE Groq API key
+-------------------------------------------------
+  1. Go to: https://console.groq.com
+  2. Sign up (free — no credit card)
+  3. Click "API Keys" then "Create API Key"
+  4. Copy the key and paste it in server/.env
+
+-------------------------------------------------
+STEP 5 — MongoDB (pick one)
+-------------------------------------------------
+  Option A — MongoDB Atlas (recommended, free):
+    1. Go to https://cloud.mongodb.com
+    2. Create a free cluster
+    3. Click "Connect" and copy the connection string
+    4. Replace <password> with your DB password
+    5. Paste the full URI in server/.env
+
+  Option B — Local MongoDB:
+    mongodb://localhost:27017/resumatch
+
+-------------------------------------------------
+STEP 6 — Copy all project files into correct locations
+-------------------------------------------------
+  Use this panel — click each file and copy it.
+  Place each file exactly at the path shown in the sidebar.
+
+-------------------------------------------------
+STEP 7 — Run both servers
+-------------------------------------------------
+  Terminal 1 (backend):
+    cd resumatch/server
+    node index.js
+
+  Terminal 2 (frontend):
+    cd resumatch/client
+    npm run dev
+
+  Frontend: http://localhost:5173
+  Backend:  http://localhost:5000
+
+-------------------------------------------------
+FILE ORDER TO CREATE:
+-------------------------------------------------
+  1.  server/.env
+  2.  server/.gitignore
+  3.  server/package.json
+  4.  server/index.js
+  5.  server/routes/analyze.js
+  6.  server/models/Analysis.js
+  7.  client/vite.config.js
+  8.  client/index.html
+  9.  client/package.json
+  10. client/src/main.jsx
+  11. client/src/App.jsx
+  12. client/src/components/UploadForm.jsx
+  13. client/src/components/ResultCard.jsx
+  14. client/src/index.css
+  15. README.md (in root resumatch/ folder)
+`
+},
+
+env: {
+  name: "server/.env",
+  content:
+`PORT=5000
+MONGO_URI=mongodb+srv://your_user:your_password@cluster.mongodb.net/resumatch
+GROQ_API_KEY=gsk_your_groq_api_key_here
+`
+},
+
+gitignore: {
+  name: "server/.gitignore  (also put a copy in client/)",
+  content:
+`node_modules/
+.env
+dist/
+*.log
+.DS_Store
+`
+},
+
+pkg_server: {
+  name: "server/package.json",
+  content:
+`{
+  "name": "resumatch-server",
+  "version": "1.0.0",
+  "description": "ResuMatch backend — Express + Groq + MongoDB",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "groq-sdk": "^0.3.3",
+    "mongoose": "^8.2.1",
+    "multer": "^1.4.5-lts.1",
+    "pdf-parse": "^1.1.1"
+  }
+}
+`
+},
+
+server_index: {
+  name: "server/index.js",
+  content:
+`const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Middleware
+app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(express.json());
+
+// Routes
+const analyzeRoute = require('./routes/analyze');
+app.use('/api/analyze', analyzeRoute);
+
+// Health check
+app.get('/', (req, res) => {
+  res.json({ message: 'ResuMatch API is running' });
+});
+
+// Connect to MongoDB then start server
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log('MongoDB connected');
+    app.listen(PORT, () => {
+      console.log('Server running on port ' + PORT);
+    });
+  })
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  });
+`
+},
+
+analyze_route: {
+  name: "server/routes/analyze.js",
+  content:
+`const express = require('express');
+const router = express.Router();
+const multer = require('multer');
+const pdfParse = require('pdf-parse');
+const Groq = require('groq-sdk');
+const Analysis = require('../models/Analysis');
+
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+// Store uploaded file in memory — no disk writes needed
+const upload = multer({ storage: multer.memoryStorage() });
+
+// POST /api/analyze
+router.post('/', upload.single('resume'), async (req, res) => {
+  try {
+    const { jobDescription } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'No resume PDF uploaded.' });
+    }
+    if (!jobDescription || jobDescription.trim().length < 20) {
+      return res.status(400).json({ error: 'Job description is too short.' });
+    }
+
+    // Step 1: Extract text from PDF buffer
+    const pdfData = await pdfParse(req.file.buffer);
+    const resumeText = pdfData.text.trim();
+
+    if (!resumeText || resumeText.length < 50) {
+      return res.status(400).json({
+        error: 'Could not extract text from PDF. Make sure it is not a scanned image.',
+      });
+    }
+
+    // Step 2: Build prompt
+    const prompt =
+      'You are an expert ATS (Applicant Tracking System) and technical recruiter.\n\n' +
+      'Analyze the following resume against the job description and return a JSON response ONLY.\n' +
+      'Do not include any explanation or text outside the JSON block.\n\n' +
+      'Resume:\n' + resumeText.substring(0, 4000) + '\n\n' +
+      'Job Description:\n' + jobDescription.substring(0, 2000) + '\n\n' +
+      'Return ONLY this JSON structure — no extra text, no markdown:\n' +
+      '{\n' +
+      '  "score": <integer 0-100>,\n' +
+      '  "verdict": "<one of: Strong Match | Good Match | Partial Match | Weak Match>",\n' +
+      '  "matched_skills": ["skill1", "skill2"],\n' +
+      '  "missing_skills": ["skill1", "skill2"],\n' +
+      '  "reasoning": "<2-3 sentence explanation of the score>"\n' +
+      '}';
+
+    // Step 3: Call Groq API
+    const completion = await groq.chat.completions.create({
+      model: 'llama3-70b-8192',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.2,
+      max_tokens: 800,
+    });
+
+    const rawResponse = completion.choices[0]?.message?.content || '';
+
+    // Step 4: Parse JSON from response
+    let parsed;
+    try {
+      const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('No JSON found in response');
+      parsed = JSON.parse(jsonMatch[0]);
+    } catch (parseErr) {
+      console.error('Groq parse error:', rawResponse);
+      return res.status(500).json({ error: 'AI returned an unexpected format. Please try again.' });
+    }
+
+    // Step 5: Save to MongoDB
+    const analysis = new Analysis({
+      resumeText: resumeText.substring(0, 3000),
+      jobDescription: jobDescription.substring(0, 2000),
+      score: parsed.score,
+      verdict: parsed.verdict,
+      matchedSkills: parsed.matched_skills || [],
+      missingSkills: parsed.missing_skills || [],
+      reasoning: parsed.reasoning || '',
+    });
+    await analysis.save();
+
+    // Step 6: Return result to frontend
+    res.json({
+      score: parsed.score,
+      verdict: parsed.verdict,
+      matchedSkills: parsed.matched_skills || [],
+      missingSkills: parsed.missing_skills || [],
+      reasoning: parsed.reasoning || '',
+      analysisId: analysis._id,
+    });
+
+  } catch (err) {
+    console.error('Analyze error:', err.message);
+    res.status(500).json({ error: 'Something went wrong. Please try again.' });
+  }
+});
+
+module.exports = router;
+`
+},
+
+model: {
+  name: "server/models/Analysis.js",
+  content:
+`const mongoose = require('mongoose');
+
+const AnalysisSchema = new mongoose.Schema(
+  {
+    resumeText: {
+      type: String,
+      required: true,
+    },
+    jobDescription: {
+      type: String,
+      required: true,
+    },
+    score: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 100,
+    },
+    verdict: {
+      type: String,
+      enum: ['Strong Match', 'Good Match', 'Partial Match', 'Weak Match'],
+      required: true,
+    },
+    matchedSkills: {
+      type: [String],
+      default: [],
+    },
+    missingSkills: {
+      type: [String],
+      default: [],
+    },
+    reasoning: {
+      type: String,
+      default: '',
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model('Analysis', AnalysisSchema);
+`
+},
+
+vite_config: {
+  name: "client/vite.config.js",
+  content:
+`import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 5173,
+  },
+});
+`
+},
+
+index_html: {
+  name: "client/index.html",
+  content:
+`<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ResuMatch — AI Resume Screener</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+`
+},
+
+pkg_client: {
+  name: "client/package.json",
+  content:
+`{
+  "name": "resumatch-client",
+  "version": "0.0.0",
+  "description": "ResuMatch frontend — React + Vite",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.6.7",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.1.4"
+  }
+}
+`
+},
+
+main_jsx: {
+  name: "client/src/main.jsx",
+  content:
+`import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.jsx';
+import './index.css';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+`
+},
+
+app_jsx: {
+  name: "client/src/App.jsx",
+  content:
+`import { useState } from 'react';
+import UploadForm from './components/UploadForm';
+import ResultCard from './components/ResultCard';
+import './index.css';
+
+function App() {
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleResult = (data) => {
+    setResult(data);
+    setError('');
+  };
+
+  const handleError = (msg) => {
+    setError(msg);
+    setResult(null);
+  };
+
+  const handleReset = () => {
+    setResult(null);
+    setError('');
+  };
+
+  return (
+    <div className="app">
+      <header className="app-header">
+        <div className="logo">
+          <span className="logo-icon">📄</span>
+          <span className="logo-text">ResuMatch</span>
+        </div>
+        <p className="tagline">
+          AI-powered resume screening — instantly match your resume to any job
+        </p>
+      </header>
+
+      <main className="app-main">
+        {!result ? (
+          <>
+            <UploadForm
+              onResult={handleResult}
+              onError={handleError}
+              loading={loading}
+              setLoading={setLoading}
+            />
+            {error && <div className="error-banner">⚠️ {error}</div>}
+          </>
+        ) : (
+          <ResultCard result={result} onReset={handleReset} />
+        )}
+      </main>
+
+      <footer className="app-footer">
+        Built with Groq · LLaMA 3 70B · MERN Stack
+      </footer>
+    </div>
+  );
+}
+
+export default App;
+`
+},
+
+uploadform: {
+  name: "client/src/components/UploadForm.jsx",
+  content:
+`import { useState, useRef } from 'react';
+import axios from 'axios';
+
+const API_URL = 'http://localhost:5000/api/analyze';
+
+export default function UploadForm({ onResult, onError, loading, setLoading }) {
+  const [file, setFile] = useState(null);
+  const [jobDesc, setJobDesc] = useState('');
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef();
+
+  const handleFile = (selected) => {
+    if (!selected) return;
+    if (selected.type !== 'application/pdf') {
+      onError('Please upload a PDF file only.');
+      return;
+    }
+    if (selected.size > 5 * 1024 * 1024) {
+      onError('File size must be under 5MB.');
+      return;
+    }
+    setFile(selected);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    handleFile(e.dataTransfer.files[0]);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!file) { onError('Please upload your resume PDF.'); return; }
+    if (jobDesc.trim().length < 20) {
+      onError('Please enter a job description (at least 20 characters).');
+      return;
+    }
+
+    setLoading(true);
+    const formData = new FormData();
+    formData.append('resume', file);
+    formData.append('jobDescription', jobDesc);
+
+    try {
+      const { data } = await axios.post(API_URL, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 30000,
+      });
+      onResult(data);
+    } catch (err) {
+      const msg =
+        err.response?.data?.error || 'Server error. Make sure the backend is running.';
+      onError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="form-card">
+      <form onSubmit={handleSubmit}>
+
+        {/* PDF Upload */}
+        <div className="form-group">
+          <label className="form-label">Resume (PDF)</label>
+          <div
+            className={'drop-zone' + (dragOver ? ' drag-over' : '') + (file ? ' has-file' : '')}
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current.click()}
+          >
+            <input
+              type="file"
+              accept=".pdf"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              onChange={(e) => handleFile(e.target.files[0])}
+            />
+            {file ? (
+              <div className="file-selected">
+                <span className="file-icon">✅</span>
+                <span className="file-name">{file.name}</span>
+                <span className="file-size">({(file.size / 1024).toFixed(1)} KB)</span>
+              </div>
+            ) : (
+              <div className="drop-placeholder">
+                <span className="drop-icon">📂</span>
+                <span>Drop your PDF here or click to browse</span>
+                <span className="drop-hint">PDF only · Max 5MB</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Job Description */}
+        <div className="form-group">
+          <label className="form-label">Job Description</label>
+          <textarea
+            className="jd-textarea"
+            placeholder="Paste the full job description here..."
+            value={jobDesc}
+            onChange={(e) => setJobDesc(e.target.value)}
+            rows={10}
+          />
+          <span className="char-count">{jobDesc.length} chars</span>
+        </div>
+
+        <button type="submit" className="submit-btn" disabled={loading}>
+          {loading ? (
+            <span className="loading-text">
+              <span className="spinner" /> Analyzing with AI...
+            </span>
+          ) : (
+            '🔍 Analyze Resume'
+          )}
+        </button>
+
+      </form>
+    </div>
+  );
+}
+`
+},
+
+resultcard: {
+  name: "client/src/components/ResultCard.jsx",
+  content:
+`export default function ResultCard({ result, onReset }) {
+  const { score, verdict, matchedSkills, missingSkills, reasoning } = result;
+
+  const getScoreColor = (s) => {
+    if (s >= 75) return '#a6e3a1';
+    if (s >= 50) return '#89b4fa';
+    if (s >= 30) return '#f9e2af';
+    return '#f38ba8';
+  };
+
+  const getVerdictClass = (v) => {
+    const map = {
+      'Strong Match': 'verdict-strong',
+      'Good Match': 'verdict-good',
+      'Partial Match': 'verdict-partial',
+      'Weak Match': 'verdict-weak',
+    };
+    return map[v] || 'verdict-partial';
+  };
+
+  const circumference = 2 * Math.PI * 45;
+  const offset = circumference - (score / 100) * circumference;
+
+  return (
+    <div className="result-card">
+
+      {/* Score Ring */}
+      <div className="score-section">
+        <svg width="130" height="130" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="45" fill="none" stroke="#313244" strokeWidth="10" />
+          <circle
+            cx="60" cy="60" r="45" fill="none"
+            stroke={getScoreColor(score)}
+            strokeWidth="10"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            transform="rotate(-90 60 60)"
+            style={{ transition: 'stroke-dashoffset 1s ease' }}
+          />
+          <text x="60" y="55" textAnchor="middle" fill={getScoreColor(score)}
+            fontSize="22" fontWeight="bold" fontFamily="Arial">{score}</text>
+          <text x="60" y="72" textAnchor="middle" fill="#6c7086"
+            fontSize="11" fontFamily="Arial">/ 100</text>
+        </svg>
+        <div className={'verdict-badge ' + getVerdictClass(verdict)}>{verdict}</div>
+      </div>
+
+      {/* Reasoning */}
+      <div className="reasoning-box">
+        <h3 className="section-title">AI Analysis</h3>
+        <p className="reasoning-text">{reasoning}</p>
+      </div>
+
+      {/* Skills Grid */}
+      <div className="skills-grid">
+        <div className="skills-col">
+          <h3 className="section-title matched-title">
+            ✅ Matched Skills ({matchedSkills.length})
+          </h3>
+          <div className="skills-list">
+            {matchedSkills.length > 0
+              ? matchedSkills.map((s, i) => (
+                  <span key={i} className="skill-tag matched">{s}</span>
+                ))
+              : <span className="no-skills">None detected</span>}
+          </div>
+        </div>
+        <div className="skills-col">
+          <h3 className="section-title missing-title">
+            ❌ Missing Skills ({missingSkills.length})
+          </h3>
+          <div className="skills-list">
+            {missingSkills.length > 0
+              ? missingSkills.map((s, i) => (
+                  <span key={i} className="skill-tag missing">{s}</span>
+                ))
+              : <span className="no-skills">None — great fit!</span>}
+          </div>
+        </div>
+      </div>
+
+      <button className="reset-btn" onClick={onReset}>
+        ← Analyze Another Resume
+      </button>
+    </div>
+  );
+}
+`
+},
+
+css: {
+  name: "client/src/index.css",
+  content:
+`* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0f0f1a;
+  color: #cdd6f4;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+}
+
+/* HEADER */
+.app-header {
+  text-align: center;
+  padding: 44px 0 32px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.logo-icon { font-size: 34px; }
+.logo-text {
+  font-size: 34px;
+  font-weight: 800;
+  color: #89b4fa;
+  letter-spacing: -0.5px;
+}
+.tagline { color: #6c7086; font-size: 15px; margin-top: 4px; }
+
+/* MAIN */
+.app-main { margin-top: 10px; }
+
+/* FORM CARD */
+.form-card {
+  background: #1e1e2e;
+  border: 1px solid #313244;
+  border-radius: 14px;
+  padding: 30px;
+}
+
+.form-group { margin-bottom: 24px; }
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #89b4fa;
+  letter-spacing: 0.3px;
+}
+
+/* DROP ZONE */
+.drop-zone {
+  border: 2px dashed #313244;
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #6c7086;
+  font-size: 14px;
+}
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: #89b4fa;
+  background: #181825;
+  color: #cdd6f4;
+}
+.drop-zone.has-file {
+  border-color: #a6e3a1;
+  border-style: solid;
+  background: #181825;
+}
+.drop-placeholder {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+.drop-icon { font-size: 30px; margin-bottom: 4px; }
+.drop-hint { font-size: 12px; color: #45475a; margin-top: 2px; }
+.file-selected {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.file-icon { font-size: 22px; }
+.file-name { color: #a6e3a1; font-weight: 600; }
+.file-size { color: #6c7086; font-size: 12px; }
+
+/* TEXTAREA */
+.jd-textarea {
+  width: 100%;
+  background: #181825;
+  border: 1px solid #313244;
+  border-radius: 8px;
+  color: #cdd6f4;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  line-height: 1.6;
+  transition: border-color 0.2s;
+}
+.jd-textarea:focus {
+  outline: none;
+  border-color: #89b4fa;
+}
+.char-count {
+  float: right;
+  font-size: 11px;
+  color: #45475a;
+  margin-top: 5px;
+}
+
+/* SUBMIT BUTTON */
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: #89b4fa;
+  color: #1e1e2e;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  letter-spacing: 0.3px;
+}
+.submit-btn:hover:not(:disabled) { background: #74c7ec; }
+.submit-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.loading-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #1e1e2e;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ERROR */
+.error-banner {
+  margin-top: 16px;
+  background: rgba(243, 139, 168, 0.1);
+  border: 1px solid #f38ba8;
+  color: #f38ba8;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* RESULT CARD */
+.result-card {
+  background: #1e1e2e;
+  border: 1px solid #313244;
+  border-radius: 14px;
+  padding: 30px;
+}
+
+.score-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.verdict-badge {
+  padding: 7px 22px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.3px;
+}
+.verdict-strong {
+  background: rgba(166, 227, 161, 0.1);
+  color: #a6e3a1;
+  border: 1px solid #a6e3a1;
+}
+.verdict-good {
+  background: rgba(137, 180, 250, 0.1);
+  color: #89b4fa;
+  border: 1px solid #89b4fa;
+}
+.verdict-partial {
+  background: rgba(249, 226, 175, 0.1);
+  color: #f9e2af;
+  border: 1px solid #f9e2af;
+}
+.verdict-weak {
+  background: rgba(243, 139, 168, 0.1);
+  color: #f38ba8;
+  border: 1px solid #f38ba8;
+}
+
+/* REASONING */
+.reasoning-box {
+  background: #181825;
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 22px;
+}
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  color: #6c7086;
+}
+.matched-title { color: #a6e3a1 !important; }
+.missing-title { color: #f38ba8 !important; }
+.reasoning-text {
+  color: #a6adc8;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+/* SKILLS */
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.skills-col {
+  background: #181825;
+  border-radius: 10px;
+  padding: 18px;
+}
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.skill-tag {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.skill-tag.matched {
+  background: rgba(166, 227, 161, 0.1);
+  color: #a6e3a1;
+  border: 1px solid rgba(166, 227, 161, 0.3);
+}
+.skill-tag.missing {
+  background: rgba(243, 139, 168, 0.1);
+  color: #f38ba8;
+  border: 1px solid rgba(243, 139, 168, 0.3);
+}
+.no-skills {
+  color: #45475a;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* RESET BUTTON */
+.reset-btn {
+  width: 100%;
+  padding: 13px;
+  background: transparent;
+  border: 1px solid #313244;
+  border-radius: 8px;
+  color: #6c7086;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.reset-btn:hover {
+  border-color: #89b4fa;
+  color: #89b4fa;
+}
+
+/* FOOTER */
+.app-footer {
+  text-align: center;
+  margin-top: 32px;
+  color: #45475a;
+  font-size: 12px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 560px) {
+  .skills-grid { grid-template-columns: 1fr; }
+  .form-card, .result-card { padding: 20px; }
+}
+`
+},
+
+readme: {
+  name: "README.md  (place in root resumatch/ folder)",
+  content:
+`# ResuMatch — AI Resume Screener
+
+![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=flat&logo=mongodb&logoColor=white)
+![Express](https://img.shields.io/badge/Express-000000?style=flat&logo=express&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=nodedotjs&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-LLaMA3_70B-orange?style=flat)
+
+A full-stack MERN application that parses a resume PDF and a job description,
+uses the Groq API (LLaMA 3 70B) to return an AI-powered match score (0-100),
+matched skills, missing skills, and a reasoning summary. Every analysis is
+persisted in MongoDB with timestamps.
+
+## Features
+
+- Drag-and-drop PDF resume upload
+- Full text extraction from PDF via pdf-parse
+- AI match score (0-100) with Strong/Good/Partial/Weak verdict
+- Matched and missing skills breakdown
+- AI reasoning paragraph explaining the score
+- All analyses saved to MongoDB with timestamps
+- Animated SVG score ring on results screen
+
+## Tech Stack
+
+| Layer      | Technology                          |
+|------------|-------------------------------------|
+| Frontend   | React 18, Vite, Axios               |
+| Backend    | Node.js, Express, Multer, pdf-parse |
+| AI         | Groq API — llama3-70b-8192 (free)   |
+| Database   | MongoDB + Mongoose                  |
+
+## Project Structure
+
+  resumatch/
+  ├── server/
+  │   ├── index.js              Express app + MongoDB connection
+  │   ├── routes/analyze.js     PDF parsing + Groq API + DB save
+  │   ├── models/Analysis.js    Mongoose schema
+  │   └── .env                  API keys (not committed to git)
+  └── client/
+      ├── index.html
+      ├── vite.config.js
+      └── src/
+          ├── main.jsx
+          ├── App.jsx
+          ├── index.css
+          └── components/
+              ├── UploadForm.jsx
+              └── ResultCard.jsx
+
+## Setup
+
+1. Clone the repo
+2. Get a free Groq API key at https://console.groq.com
+3. Get a free MongoDB Atlas URI at https://cloud.mongodb.com
+4. Add both to server/.env (see .env file for format)
+5. Install backend deps:  cd server && npm install
+6. Install frontend deps: cd client && npm install
+7. Run backend:  cd server && node index.js
+8. Run frontend: cd client && npm run dev
+9. Open http://localhost:5173
+
+## Author
+
+Muhammad Usman Awan
+GitHub: github.com/Usman-Ifty
+LinkedIn: linkedin.com/in/usman-awan
+`
+}
+
+};
+
+let currentKey = 'setup';
+
+function show(key, el) {
+  currentKey = key;
+  const f = files[key];
+  document.getElementById('fname').textContent = f.name;
+  const escaped = f.content
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  document.getElementById('display').textContent = f.content;
+  document.querySelectorAll('.file-item').forEach(function(item) {
+    item.classList.remove('active');
+  });
+  if (el) el.classList.add('active');
+}
+
+function copyActive(btn) {
+  const content = files[currentKey].content;
+  navigator.clipboard.writeText(content).then(function() {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(function() {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(function() {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = content;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = 'Copied!';
+    setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+  });
+}
+
+// Load default on page open
+window.onload = function() {
+  document.getElementById('display').textContent = files['setup'].content;
+  document.querySelectorAll('.file-item')[1].classList.add('active');
+};
+</script>
+
+</body>
+</html>
