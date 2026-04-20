@@ -62,7 +62,7 @@ router.post('/', authMiddleware, upload.single('resume'), async (req, res) => {
 
     // Step 3: Call Groq API
     const completion = await groq.chat.completions.create({
-      model: 'llama-3.1-70b-versatile',
+      model: 'llama-3.3-70b-versatile',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.2,
       max_tokens: 800,
