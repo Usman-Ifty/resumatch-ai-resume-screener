@@ -6,7 +6,13 @@ const Groq = require('groq-sdk');
 const Analysis = require('../models/Analysis');
 const authMiddleware = require('../middleware/auth');
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+// Sanitize API Key to remove accidental spaces/newlines
+const apiKey = (process.env.GROQ_API_KEY || '').trim();
+const groq = new Groq({ 
+  apiKey: apiKey,
+  timeout: 30000 // 30 second timeout
+});
+
 const upload = multer({ storage: multer.memoryStorage() });
 
 // POST /api/analyze  — protected
@@ -56,7 +62,7 @@ router.post('/', authMiddleware, upload.single('resume'), async (req, res) => {
 
     // Step 3: Call Groq API
     const completion = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama-3.1-70b-versatile',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.2,
       max_tokens: 800,
