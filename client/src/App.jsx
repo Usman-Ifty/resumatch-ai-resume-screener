@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiLayout, FiClock, FiCpu, FiUser, FiLogOut } from 'react-icons/fi';
+import { FiLayout, FiClock, FiCpu, FiUser, FiLogOut, FiHome } from 'react-icons/fi';
 import { useAuth } from './context/AuthContext';
 import UploadForm from './components/UploadForm';
 import ResultCard from './components/ResultCard';
 import HistoryDashboard from './components/HistoryDashboard';
 import AuthPage from './components/AuthPage';
+import DashboardHub from './components/DashboardHub';
 import './index.css';
 
 function App() {
@@ -13,11 +14,12 @@ function App() {
   const [results, setResults] = useState([]); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [view, setView] = useState('scan'); // 'scan' | 'history'
+  const [view, setView] = useState('dashboard'); // 'dashboard' | 'scan' | 'history'
 
   const handleResults = (data) => {
     setResults(data);
     setError('');
+    setView('scan'); // If in scan view, result will show.
   };
 
   const handleError = (msg) => {
@@ -38,12 +40,18 @@ function App() {
     <div className="app">
       {/* NAVBAR */}
       <nav className="navbar">
-        <div className="logo-container">
+        <div className="logo-container" style={{ cursor: 'pointer' }} onClick={() => { setView('dashboard'); handleReset(); }}>
           <div className="logo-icon"><FiCpu /></div>
           <div className="logo-text">ResuMatch AI</div>
         </div>
 
         <div className="nav-links">
+          <button 
+            className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} 
+            onClick={() => { setView('dashboard'); handleReset(); }}
+          >
+            <FiHome /> Home
+          </button>
           <button 
             className={`nav-btn ${view === 'scan' ? 'active' : ''}`} 
             onClick={() => { setView('scan'); handleReset(); }}
@@ -71,7 +79,13 @@ function App() {
 
       <main className="app-main">
         <AnimatePresence mode="wait">
-          {view === 'scan' ? (
+          {view === 'dashboard' && (
+            <motion.div key="dashboard" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+              <DashboardHub userName={user.name} onStartNewScan={() => setView('scan')} />
+            </motion.div>
+          )}
+
+          {view === 'scan' && (
             results.length === 0 ? (
               <motion.div
                 key="form"
@@ -81,10 +95,10 @@ function App() {
               >
                 <header className="app-header" style={{ textAlign: 'center', marginBottom: '40px' }}>
                   <h1 style={{ fontSize: '42px', fontWeight: 800, marginBottom: '10px' }}>
-                    Welcome, <span style={{ color: 'var(--neon-blue)' }}>{user.name.split(' ')[0]}</span>
+                    Next-Gen Resume <span style={{ color: 'var(--neon-blue)' }}>Intelligence</span>
                   </h1>
                   <p className="tagline" style={{ fontSize: '18px' }}>
-                    Personalized Batch Resume Intelligence
+                    Batch Rank Resumes · Identify Skill Gaps · Generate AI Improvements
                   </p>
                 </header>
 
@@ -116,7 +130,9 @@ function App() {
                 <ResultCard results={results} onReset={handleReset} />
               </motion.div>
             )
-          ) : (
+          )}
+
+          {view === 'history' && (
             <motion.div
               key="history"
               initial={{ opacity: 0, y: 50 }}
@@ -137,7 +153,7 @@ function App() {
           Designed & Developed by <span className="author-name">Muhammad Usman Awan</span> 🚀
         </div>
         <p style={{ marginTop: '20px', color: 'var(--text-dim)', fontSize: '12px' }}>
-          Authenticated Secure Session for {user.email}
+          Official ResuMatch Release v2.1.0 · Secure Session Activity
         </p>
       </footer>
     </div>
