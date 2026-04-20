@@ -115,7 +115,10 @@ router.post('/', upload.single('resume'), async (req, res) => {
     });
 
   } catch (err) {
-    console.error('Analyze error:', err.message);
+    console.error('Analyze error type:', err?.constructor?.name);
+    console.error('Analyze error message:', err?.message);
+    console.error('Analyze error status:', err?.status);
+    console.error('Analyze error full:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
     res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
 });
