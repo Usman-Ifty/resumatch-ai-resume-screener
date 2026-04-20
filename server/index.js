@@ -15,13 +15,10 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5000',
 ];
-if (process.env.ALLOWED_ORIGIN) {
-  allowedOrigins.push(process.env.ALLOWED_ORIGIN);
-}
+if (process.env.ALLOWED_ORIGIN) allowedOrigins.push(process.env.ALLOWED_ORIGIN);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow server-to-server (no origin) and listed origins
     if (!origin || allowedOrigins.includes(origin) || NODE_ENV === 'production') {
       return callback(null, true);
     }
@@ -29,18 +26,19 @@ app.use(cors({
   },
   credentials: true,
 }));
+
 app.use(express.json());
 
 // Routes
 const analyzeRoutes = require('./routes/analyze');
+const authRoutes = require('./routes/auth');
+
 app.use('/api/analyze', analyzeRoutes);
+app.use('/api/auth', authRoutes);
 
 // --- SERVE FRONTEND IN PRODUCTION ---
-if (process.env.NODE_ENV === 'production') {
-  // Serve static files from the React app dist folder
+if (NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/dist')));
-
-  // For any request that doesn't match an API route, send back index.html
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
   });

@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiLayout, FiClock, FiCpu, FiUser } from 'react-icons/fi';
+import { FiLayout, FiClock, FiCpu, FiUser, FiLogOut } from 'react-icons/fi';
+import { useAuth } from './context/AuthContext';
 import UploadForm from './components/UploadForm';
 import ResultCard from './components/ResultCard';
 import HistoryDashboard from './components/HistoryDashboard';
+import AuthPage from './components/AuthPage';
 import './index.css';
 
 function App() {
-  const [results, setResults] = useState([]); // Support batch results
+  const { user, logout, loading: authLoading } = useAuth();
+  const [results, setResults] = useState([]); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [view, setView] = useState('scan'); // 'scan' | 'history'
@@ -26,6 +29,10 @@ function App() {
     setResults([]);
     setError('');
   };
+
+  if (authLoading) return <div className="loading-state">Initializing ResuMatch...</div>;
+
+  if (!user) return <AuthPage />;
 
   return (
     <div className="app">
@@ -49,6 +56,16 @@ function App() {
           >
             <FiClock /> History
           </button>
+          
+          <div className="user-profile">
+            <div className="profile-info">
+              <FiUser />
+              <span>{user.name.split(' ')[0]}</span>
+            </div>
+            <button className="logout-btn" onClick={logout} title="Logout">
+              <FiLogOut />
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -64,10 +81,10 @@ function App() {
               >
                 <header className="app-header" style={{ textAlign: 'center', marginBottom: '40px' }}>
                   <h1 style={{ fontSize: '42px', fontWeight: 800, marginBottom: '10px' }}>
-                    Next-Gen Resume <span style={{ color: 'var(--neon-blue)' }}>Intelligence</span>
+                    Welcome, <span style={{ color: 'var(--neon-blue)' }}>{user.name.split(' ')[0]}</span>
                   </h1>
                   <p className="tagline" style={{ fontSize: '18px' }}>
-                    Batch Rank Resumes · Identify Skill Gaps · Generate AI Improvements
+                    Personalized Batch Resume Intelligence
                   </p>
                 </header>
 
@@ -119,16 +136,8 @@ function App() {
         <div className="author-badge">
           Designed & Developed by <span className="author-name">Muhammad Usman Awan</span> 🚀
         </div>
-        <div className="social-links" style={{ marginTop: '15px', display: 'flex', justifyContent: 'center', gap: '20px' }}>
-          <a href="https://github.com/Usman-Ifty" target="_blank" rel="noopener noreferrer" className="nav-btn" style={{ padding: '8px 15px', fontSize: '13px' }}>
-            <FiCpu /> GitHub
-          </a>
-          <a href="https://linkedin.com/in/usman-awan-a85877359" target="_blank" rel="noopener noreferrer" className="nav-btn" style={{ padding: '8px 15px', fontSize: '13px', borderColor: '#0077b5', color: '#0077b5' }}>
-            <FiUser /> LinkedIn
-          </a>
-        </div>
         <p style={{ marginTop: '20px', color: 'var(--text-dim)', fontSize: '12px' }}>
-          Built with Groq · LLaMA 3.3 · MERN · Framer Motion
+          Authenticated Secure Session for {user.email}
         </p>
       </footer>
     </div>

@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 
 const AnalysisSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true,
+    },
     resumeText: {
       type: String,
       required: true,
@@ -21,38 +27,14 @@ const AnalysisSchema = new mongoose.Schema(
       enum: ['Strong Match', 'Good Match', 'Partial Match', 'Weak Match'],
       required: true,
     },
-    matchedSkills: {
-      type: [String],
-      default: [],
-    },
-    missingSkills: {
-      type: [String],
-      default: [],
-    },
-    suggestions: {
-      type: [String],
-      default: [],
-    },
-    coverLetter: {
-      type: String,
-      default: '',
-    },
-    roadmap: {
-      type: [String],
-      default: [],
-    },
-    atsScore: {
-      type: Number,
-      default: 0,
-    },
-    atsFeedback: {
-      type: String,
-      default: '',
-    },
-    reasoning: {
-      type: String,
-      default: '',
-    },
+    matchedSkills: { type: [String], default: [] },
+    missingSkills:  { type: [String], default: [] },
+    suggestions:    { type: [String], default: [] },
+    coverLetter:    { type: String,   default: '' },
+    roadmap:        { type: [String], default: [] },
+    atsScore:       { type: Number,   default: 0  },
+    atsFeedback:    { type: String,   default: '' },
+    reasoning:      { type: String,   default: '' },
   },
   { timestamps: true }
 );

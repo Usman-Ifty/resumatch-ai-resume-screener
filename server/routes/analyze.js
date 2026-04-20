@@ -4,33 +4,29 @@ const multer = require('multer');
 const pdfParse = require('pdf-parse');
 const Groq = require('groq-sdk');
 const Analysis = require('../models/Analysis');
+const authMiddleware = require('../middleware/auth');
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
-// Store uploaded file in memory — no disk writes needed
 const upload = multer({ storage: multer.memoryStorage() });
 
-// POST /api/analyze
-router.post('/', upload.single('resume'), async (req, res) => {
+// POST /api/analyze  — protected
+router.post('/', authMiddleware, upload.single('resume'), async (req, res) => {
   try {
     const { jobDescription } = req.body;
 
-    if (!req.file) {
+    if (!req.file)
       return res.status(400).json({ error: 'No resume PDF uploaded.' });
-    }
-    if (!jobDescription || jobDescription.trim().length < 20) {
+    if (!jobDescription || jobDescription.trim().length < 20)
       return res.status(400).json({ error: 'Job description is too short.' });
-    }
 
-    // Step 1: Extract text from PDF buffer
+    // Step 1: Extract text from PDF
     const pdfData = await pdfParse(req.file.buffer);
     const resumeText = pdfData.text.trim();
 
-    if (!resumeText || resumeText.length < 50) {
+    if (!resumeText || resumeText.length < 50)
       return res.status(400).json({
         error: 'Could not extract text from PDF. Make sure it is not a scanned image.',
       });
-    }
 
     // Step 2: Build prompt
     const prompt =
@@ -68,20 +64,20 @@ router.post('/', upload.single('resume'), async (req, res) => {
 
     const rawResponse = completion.choices[0]?.message?.content || '';
 
-    // Step 4: Parse JSON from response
+    // Step 4: Parse JSON
     let parsed;
     try {
       const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
       if (!jsonMatch) throw new Error('No JSON found in response');
       parsed = JSON.parse(jsonMatch[0]);
-      console.log('AI Response Parsed:', parsed);
     } catch (parseErr) {
       console.error('Groq parse error:', rawResponse);
       return res.status(500).json({ error: 'AI returned an unexpected format. Please try again.' });
     }
 
-    // Step 5: Save to MongoDB
+    // Step 5: Save to MongoDB with userId
     const analysis = new Analysis({
+      userId: req.userId,
       resumeText: resumeText.substring(0, 3000),
       jobDescription: jobDescription.substring(0, 2000),
       score: parsed.score,
@@ -97,7 +93,7 @@ router.post('/', upload.single('resume'), async (req, res) => {
     });
     await analysis.save();
 
-    // Step 6: Return result to frontend
+    // Step 6: Return result
     res.json({
       score: parsed.score,
       verdict: parsed.verdict,
@@ -109,8 +105,8 @@ router.post('/', upload.single('resume'), async (req, res) => {
       atsScore: parsed.ats_score || 0,
       atsFeedback: parsed.ats_feedback || '',
       reasoning: parsed.reasoning || '',
-      resumeText: resumeText,
-      jobDescription: jobDescription,
+      resumeText,
+      jobDescription,
       analysisId: analysis._id,
     });
 
@@ -118,25 +114,27 @@ router.post('/', upload.single('resume'), async (req, res) => {
     console.error('Analyze error type:', err?.constructor?.name);
     console.error('Analyze error message:', err?.message);
     console.error('Analyze error status:', err?.status);
-    console.error('Analyze error full:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
     res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
 });
 
-// GET /api/analyze/history
-router.get('/history', async (req, res) => {
+// GET /api/analyze/history  — protected, only current user's history
+router.get('/history', authMiddleware, async (req, res) => {
   try {
-    const history = await Analysis.find().sort({ createdAt: -1 });
+    const history = await Analysis.find({ userId: req.userId }).sort({ createdAt: -1 });
     res.json(history);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch history' });
   }
 });
 
-// DELETE /api/analyze/history/:id
-router.delete('/history/:id', async (req, res) => {
+// DELETE /api/analyze/history/:id  — protected, only own entries
+router.delete('/history/:id', authMiddleware, async (req, res) => {
   try {
-    await Analysis.findByIdAndDelete(req.params.id);
+    const analysis = await Analysis.findOne({ _id: req.params.id, userId: req.userId });
+    if (!analysis)
+      return res.status(404).json({ error: 'Not found or not authorized.' });
+    await analysis.deleteOne();
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete entry' });
